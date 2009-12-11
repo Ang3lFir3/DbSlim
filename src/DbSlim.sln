@@ -5,6 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbSlim", "DbSlim\DbSlim.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbSlim.Specs", "DbSlim.Specs\DbSlim.Specs.csproj", "{0E2B8F0C-82AA-499D-AA9A-34B0230A2AB6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{B6E75544-E36A-496C-A007-416F317284AE}"
+	ProjectSection(SolutionItems) = preProject
+		..\README = ..\README
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

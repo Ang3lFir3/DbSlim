@@ -1,50 +1,42 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace DbSlim
 {
-  public class Select
+  public class Execute
   {
     readonly string connectionString;
-    readonly string tableName;
-    readonly string condition;
+    readonly string sqlText;
 
-    public Select(string connectionString, string tableName, string condition)
+    public Execute(string connectionString, string sqlText)
     {
       this.connectionString = connectionString;
-      this.tableName = tableName;
-      this.condition = condition;
+      this.sqlText = sqlText;
     }
 
     public List<object> Query()
     {
       var result = new List<object>();
 
-      using(var connection = new SqlConnection(connectionString))
+      using (var connection = new SqlConnection(connectionString))
       {
         connection.Open();
 
-        var command = MakeCommand(connection, MakeQuery());
+        var command = MakeCommand(connection, sqlText);
         var table = LoadTable(command);
 
-        result =  CreateResults(table);
-        
-      } 
+        result = CreateResults(table);
+
+      }
 
       return result;
-    }
-
-    string MakeQuery()
-    {
-      return string.Format("Select * from {0} where {1}", tableName, condition);
     }
 
     DataTable LoadTable(IDbCommand command)
     {
       var table = new DataTable();
-        table.Load(command.ExecuteReader());
+      table.Load(command.ExecuteReader());
       return table;
     }
 
@@ -65,7 +57,7 @@ namespace DbSlim
         AddFieldValuePairs(result, columnNames, table.Rows[i]);
       }
 
-      return result; 
+      return result;
     }
 
     void AddFieldValuePairs(List<object> objects, List<string> names, DataRow row)
@@ -73,7 +65,7 @@ namespace DbSlim
       var rowResult = new List<object>();
       foreach (var name in names)
       {
-        var fieldValuePairs = new List<object> {name, row[name]};
+        var fieldValuePairs = new List<object> { name, row[name] };
 
         rowResult.Add(fieldValuePairs);
       }
@@ -90,5 +82,7 @@ namespace DbSlim
       }
       return columnNames;
     }
+
   }
+
 }
