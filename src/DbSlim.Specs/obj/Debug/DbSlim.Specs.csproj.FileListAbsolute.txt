@@ -1,9 +1,0 @@
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\DbSlim.Specs.dll
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\DbSlim.Specs.pdb
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\Machine.Specifications.dll
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\Machine.Specifications.pdb
-D:\Source\DbSlim\src\DbSlim.Specs\obj\Debug\ResolveAssemblyReference.cache
-D:\Source\DbSlim\src\DbSlim.Specs\obj\Debug\DbSlim.Specs.dll
-D:\Source\DbSlim\src\DbSlim.Specs\obj\Debug\DbSlim.Specs.pdb
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\DbSlim.dll
-D:\Source\DbSlim\src\DbSlim.Specs\bin\Debug\DbSlim.pdb

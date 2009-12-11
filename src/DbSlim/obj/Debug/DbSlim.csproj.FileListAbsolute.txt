@@ -1,5 +1,0 @@
-D:\Source\DbSlim\src\DbSlim\bin\Debug\DbSlim.dll
-D:\Source\DbSlim\src\DbSlim\bin\Debug\DbSlim.pdb
-D:\Source\DbSlim\src\DbSlim\obj\Debug\ResolveAssemblyReference.cache
-D:\Source\DbSlim\src\DbSlim\obj\Debug\DbSlim.dll
-D:\Source\DbSlim\src\DbSlim\obj\Debug\DbSlim.pdb
