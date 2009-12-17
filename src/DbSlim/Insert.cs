@@ -7,13 +7,21 @@ namespace DbSlim
 {
   public class Insert
   {
-    private string connectionString;
-    private string tableName;
+        string connectionString;
+        string tableName;
+        bool identityInsert;
 
     public Insert(string connectionString, string tableName)
     {
       this.connectionString = connectionString;
       this.tableName = tableName;
+    }
+
+    public Insert(string connectionString, string tableName, string identyInsert)
+    {
+        this.identityInsert = Convert.ToBoolean(identyInsert);
+        this.connectionString = connectionString;
+        this.tableName = tableName;
     }
 
     public List<object> DoTable(List<List<object>> fitTable)
@@ -81,13 +89,16 @@ namespace DbSlim
           var value = slimTable[i][j];
           var type = table.Columns[columnName].DataType;
 
-          Console.WriteLine("columnName {0} : {1} as {2}", columnName, value, type);
-
-
-          row[columnName] = Convert.ChangeType(value, type);          
+            try
+            {
+                row[columnName] = Convert.ChangeType(value, type);
+            }
+            catch
+            {
+                throw new ApplicationException(string.Format("can't covert from {0} to {1} for column: {2}", value.GetType().Name, type.Name, columnName));
+            }
         }
         table.Rows.Add(row);
-        Console.WriteLine("Loaded {0} of {1} Rows", table.Rows.Count, i);
       }
     }
 
@@ -97,11 +108,32 @@ namespace DbSlim
       {
         bulkCopy.DestinationTableName = tableName;
 
-        Console.WriteLine("Destination table: {0}", tableName);
-        Console.WriteLine("Table Size: {0}", table.Rows.Count);
+        SetIdentyInsert(connection);
 
         bulkCopy.WriteToServer(table);
+
+        ResetIdentyInsert(connection);
       }
     }
+
+      void ResetIdentyInsert(SqlConnection connection)
+      {
+          if (identityInsert)
+              using (var command = connection.CreateCommand())
+              {
+                  command.CommandText = string.Format("set identity_insert {0} off",tableName);
+                  command.ExecuteNonQuery();
+              }
+      }
+
+      void SetIdentyInsert(SqlConnection connection)
+      {
+          if(identityInsert)
+          using(var command = connection.CreateCommand())
+          {
+              command.CommandText = string.Format("set identity_insert {0} on", tableName);
+              command.ExecuteNonQuery();
+          }
+      }
   }
 }
