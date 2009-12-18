@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace DbSlim
@@ -44,12 +45,21 @@ namespace DbSlim
       return null;
     }
 
+    private IDbCommand GetInsertCommand(SqlConnection connection)
+  {
+      using (var selectCommand = new SqlCommand("select * from " + tableName, connection))
+      {
+          var adapter = new SqlDataAdapter(selectCommand);
+          var builder = new SqlCommandBuilder(adapter);
+          return builder.GetInsertCommand();
+      }
+  }
+
     private DataTable GetTableSchema(List<List<object>> fitTable, SqlConnection connection)
     {
       using (var selectCommand = new SqlCommand("select * from " + tableName, connection))
       {
         var adapter = new SqlDataAdapter(selectCommand);
-
         var table = new DataTable();
 
         adapter.FillSchema(table, SchemaType.Source);
@@ -104,36 +114,60 @@ namespace DbSlim
 
     private void BulkLoadTableIntoDatabase(SqlConnection connection, DataTable table)
     {
-      using (var bulkCopy = new SqlBulkCopy(connection))
+      using (connection)
       {
-        bulkCopy.DestinationTableName = tableName;
-
         SetIdentyInsert(connection);
 
-        bulkCopy.WriteToServer(table);
+        InsertRows(connection, table);
 
         ResetIdentyInsert(connection);
       }
     }
 
-      void ResetIdentyInsert(SqlConnection connection)
+    void InsertRows(SqlConnection connection, DataTable table)
+    {
+      if(table.Rows.Count > 0)
       {
-          if (identityInsert)
-              using (var command = connection.CreateCommand())
-              {
-                  command.CommandText = string.Format("set identity_insert {0} off",tableName);
-                  command.ExecuteNonQuery();
-              }
-      }
-
-      void SetIdentyInsert(SqlConnection connection)
-      {
-          if(identityInsert)
-          using(var command = connection.CreateCommand())
+          using (var selectCommand = new SqlCommand("select * from " + tableName, connection))
           {
-              command.CommandText = string.Format("set identity_insert {0} on", tableName);
-              command.ExecuteNonQuery();
+              var adapter = new SqlDataAdapter(selectCommand);
+              var builder = new SqlCommandBuilder(adapter);
+              var columns = GetColumnNames(table);
+              adapter.InsertCommand = builder.GetInsertCommand(true);
+              adapter.InsertCommand.Parameters.AddWithValue("@SecurityId", 50);
+              adapter.Update(table);
           }
       }
+    }
+
+    void ResetIdentyInsert(SqlConnection connection)
+    {
+      if (identityInsert)
+          using (var command = connection.CreateCommand())
+          {
+              command.CommandText = string.Format("set identity_insert {0} off",tableName);
+              command.ExecuteNonQuery();
+          }
+    }
+
+    void SetIdentyInsert(SqlConnection connection)
+    {
+      if(identityInsert)
+      using(var command = connection.CreateCommand())
+      {
+          command.CommandText = string.Format("set identity_insert {0} on", tableName);
+          command.ExecuteNonQuery();
+      }
+    }
+
+    List<string> GetColumnNames(DataTable table)
+    {
+      var columnNames = new List<string>();
+      for (int i = 0; i < table.Columns.Count; i++)
+      {
+          columnNames.Add(table.Columns[i].ColumnName);
+      }
+      return columnNames;
+    }
   }
 }
